@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <audio controls src="./ assets/005865.mp3"></audio>
+    <div class="container">
+      <ul class="Irc-list"></ul>
+    </div>
+  </body>
+  <script src="./data.js"></script>
+  <script>
+
+
+const findIndex = () => {
+ // 播放器当前时间
+ var curTime = doms.audio.currentTime;
+//   for (var i = 0; i < data.length; i++) {
+//     if (curTime < data[i].time) {
+//       return i - 1;
+//     }
+//   }
+//   return data.length - 1;
+
+
+ let newdata = data.map((item, index) => {
+        if (item.time > curTime) {
+            return index-1;
+        }
+      }); 
+      console.log(newdata);
+      return newdata.length -1
+
+    };
+    const setOffset = (dom) => {
+      let index = findIndex();
+      let offset = liHeight * index + liHeight / 2 - containerHeight / 2;
+      if (offset < 0) {
+        offset = 0;
+      }
+      if (offset > maxOffset) {
+        offset = maxOffset;
+      }
+      doms.ul.style.transform = `translateY(-${offset}px)`;
+      let li = doms.ul.querySelector(".active");
+      if (li) {
+        li.classList.remove("active");
+      }
+      li = doms.ul.children[index];
+      if (li) {
+        doms.ul.children[index].classList.add("active");
+      }
+    };
+    // 将数字转换成秒
+    const parseTime = (str) => {
+      str = str.split(":");
+      return +str[0] * 60 + +str[1];
+    };
+    const initLrcEl = () => {
+      data.map((item, index) => {
+        let li = document.createElement("li");
+        li.textContent = item.text;
+        doms.ul.appendChild(li);
+      });
+    };
+
+
+    // 字符串转成数字
+    let data = [];
+    data = lrc.split("\n").map((item, index) => {
+      const parts = item.split("]");
+      let obj = {
+        time: parseTime(parts[0].substring(1)),
+        text: parts[1],
+      };
+      return obj;
+    });
+
+
+    
+    // 获取dom
+    const doms = {
+      audio: document.querySelector("audio"),
+      ul: document.querySelector(".container ul"),
+      container: document.querySelector(".container"),
+    };
+
+    initLrcEl();
+    let containerHeight = doms.container.clientHeight;
+    let maxOffset = doms.ul.clientHeight - containerHeight;
+    let liHeight = 30;
+
+
+    // findIndex(doms)
+    // setOffset(doms)
+
+    doms.audio.addEventListener('timeupdate', setOffset);
+
+
+
+
+  </script>
+</html>
